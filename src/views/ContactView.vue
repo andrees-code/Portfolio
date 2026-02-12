@@ -23,7 +23,7 @@
         </span>
         <h1>¿Tienes un <span class="highlight">desafío</span> para mí?</h1>
         <p class="subtitle">
-          Estoy interesado en oportunidades de Full Stack, proyectos de IA o simplemente charlar sobre tecnología.
+          Estoy interesado en oportunidades de Full Stack, proyectos de redes neuronales(IA) o simplemente charlar sobre tecnología.
           ¡Escríbeme y hagamos que suceda!
         </p>
 
