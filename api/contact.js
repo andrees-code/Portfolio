@@ -1,17 +1,18 @@
-const nodemailer = require('nodemailer')
+import nodemailer from 'nodemailer'
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { name, email, message } = req.body || {}
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const { name, email, message } = body || {}
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios.' })
   }
 
-  const transporter = nodemailer.createTransporter({
+  const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === 'true',
@@ -37,7 +38,7 @@ module.exports = async function handler(req, res) {
     })
     return res.status(200).json({ ok: true })
   } catch (error) {
-    console.error('Error al enviar email:', error)
+    console.error('Error al enviar email:', error?.message || error)
     return res.status(500).json({ error: 'Error al enviar el mensaje. Intenta de nuevo más tarde.' })
   }
 }
