@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ProjectsView from '@/views/ProjectsView.vue'
-import SkillsView from '@/views/skillsView.vue'
+import SkillsView from '@/views/SkillsView.vue'
 import ContactView from '@/views/ContactView.vue'
 
 const router = createRouter({
@@ -9,27 +9,28 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: HomeView,
-    },
-    {
-      path: '/home',
       name: 'home',
       component: HomeView,
     },
     {
+      path: '/home',
+      redirect: { name: 'home' },
+    },
+    {
       path: '/projects',
       name: 'projects',
-      component: ProjectsView
+      component: ProjectsView,
     },
     {
       path: '/skills',
       name: 'skills',
-      component: SkillsView
+      component: SkillsView,
     },
     {
       path: '/contacto',
       name: 'contacto',
-      component: ContactView
+      component: ContactView,
+      alias: '/contact',
     }
   ],
 })

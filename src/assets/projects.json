@@ -1,0 +1,22 @@
+[
+  {
+    "id": "tu-zona",
+    "title": "TuZona App",
+    "image": "/img/tuZona.png",
+    "desc": "Plataforma de estudio interactiva con generación de exámenes y retos mediante inteligencia artificial. Optimizada para rendimiento y escalabilidad.",
+    "tags": ["Vue", "Nest.js", "MongoDB", "AI"],
+    "url": "https://www.ponteaprobados.es",
+    "github": "#",
+    "destacados": true
+  },
+  {
+    "id": "pdfs-app",
+    "title": "PDFS App",
+    "image": "/img/pdfs.png",
+    "desc": "Editor de presentaciones a partir de pdfs o powerpoints en tiempo real convirtiendolos en html para hacer paginas web a modo de presentaciones interactivas.",
+    "tags": ["Vue", "Nest.js", "MongoDB", "AI"],
+    "url": "https://firebase-firestore-pinia-favoritos.vercel.app",
+    "github": "#",
+    "destacados": true
+  }
+]

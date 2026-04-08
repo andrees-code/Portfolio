@@ -1,102 +1,105 @@
 <template>
   <main class="portfolio-container">
-    <header class="navbar">
-      <div class="logo">Portfolio</div>
-      <nav>
-        <a href="/home">Home</a>
-        <a href="/projects" class="active">Projects</a>
-        <a href="/skills">Skills</a>
-        <a href="/contact">Contact</a>
+
+    <header class="navbar" :class="{ scrolled: isScrolled }">
+      <router-link to="/" class="logo" aria-label="Inicio">AB</router-link>
+      <nav aria-label="Navegación principal">
+        <router-link to="/" exact-active-class="active" active-class="active">Inicio</router-link>
+        <router-link to="/projects" active-class="active">Proyectos</router-link>
+        <router-link to="/skills" active-class="active">Skills</router-link>
+        <router-link to="/contacto" active-class="active">Contacto</router-link>
       </nav>
-      <div class="search-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </div>
+      <router-link to="/contacto" class="nav-cta" aria-label="Contactar a Andrés">Hablemos</router-link>
     </header>
 
-    <section class="projects-header">
-      <div class="header-content">
-        <h1>Mis <span class="highlight">Proyectos</span></h1>
-        <p class="subtitle">Una selección de mis trabajos más recientes y experimentos técnicos.</p>
-      </div>
-
-      <div class="filter-bar">
-        <button
-          v-for="filter in ['Todos', 'Vue', 'Nest.js', 'Firebase', 'CSS']"
-          :key="filter"
-          @click="currentFilter = filter"
-          :class="['filter-btn', { active: currentFilter === filter }]"
-        >
-          {{ filter }}
-        </button>
+    <section class="page-hero" aria-labelledby="projects-page-title">
+      <div class="page-hero-inner">
+        <span class="page-label" aria-hidden="true">02 / Proyectos</span>
+        <h1 id="projects-page-title">
+          Cosas que<br/>
+          <em>he construido</em>
+        </h1>
+        <p>Una selección de proyectos reales, con código real y decisiones técnicas que puedo defender.</p>
       </div>
     </section>
 
-    <section class="projects-grid">
-      <div
-        v-for="(project, index) in filteredProjects"
-        :key="index"
-        class="project-card-large"
+    <div class="filter-bar" role="group" aria-label="Filtrar proyectos por tecnología">
+      <button
+        v-for="filter in filters"
+        :key="filter"
+        @click="currentFilter = filter"
+        :class="['filter-btn', { active: currentFilter === filter }]"
+        :aria-pressed="currentFilter === filter"
       >
-        <div class="project-visual">
-          <img v-if="project.image" :src="project.image" :alt="project.title" />
-          <div v-else class="placeholder-visual"></div>
-          <div class="overlay">
-            <a :href="project.url" target="_blank" class="btn btn-primary">Ver Proyecto</a>
+        {{ filter }}
+      </button>
+    </div>
+
+    <section class="projects-grid" aria-live="polite" aria-label="Lista de proyectos filtrados">
+      <article
+        v-for="(project, index) in filteredProjects"
+        :key="project.title"
+        class="project-card"
+      >
+        <div class="card-visual">
+          <img v-if="project.image" :src="project.image" :alt="'Captura de pantalla de ' + project.title" />
+          <div v-else class="card-placeholder" aria-hidden="true">
+            <span>{{ project.title.charAt(0) }}</span>
+          </div>
+          <div class="card-overlay" aria-hidden="true">
+            <a :href="project.url" target="_blank" rel="noopener noreferrer" tabindex="-1">Abrir →</a>
           </div>
         </div>
 
-        <div class="project-info">
-          <div class="project-tags">
-            <span v-for="tag in project.tags" :key="tag" class="tag">{{ tag }}</span>
+        <div class="card-body">
+          <div class="card-meta">
+            <div class="card-tags" role="list" :aria-label="'Tecnologías'">
+              <span v-for="tag in project.tags" :key="tag" class="tag" role="listitem">{{ tag }}</span>
+            </div>
+            <span class="card-index" aria-hidden="true">{{ String(index + 1).padStart(2,'0') }}</span>
           </div>
-          <h3>{{ project.title }}</h3>
-          <p>{{ project.desc }}</p>
-          <div class="project-footer">
-            <a :href="project.github" v-if="project.github" class="github-link">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-              Repositorio
+
+          <h2 class="card-title">{{ project.title }}</h2>
+          <p class="card-desc">{{ project.desc }}</p>
+
+          <div class="card-footer">
+            <a :href="project.url" target="_blank" rel="noopener noreferrer" class="card-link" :aria-label="'Ver demo de ' + project.title">
+              <span>Ver demo</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M7 17L17 7M17 7H7M17 7v10"/>
+              </svg>
+            </a>
+            <a v-if="project.github" :href="project.github" target="_blank" rel="noopener noreferrer" class="card-link ghost" :aria-label="'Ver repositorio de ' + project.title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+              </svg>
+              <span>Código</span>
             </a>
           </div>
         </div>
-      </div>
+      </article>
     </section>
+
+    <div v-if="filteredProjects.length === 0" class="empty-state" role="alert">
+      <p>No hay proyectos con el filtro <em>{{ currentFilter }}</em> por ahora.</p>
+    </div>
+
   </main>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import projectsData from '../assets/projects.json'
+
+const isScrolled = ref(false)
+const handleScroll = () => { isScrolled.value = window.scrollY > 40 }
+onMounted(() => window.addEventListener('scroll', handleScroll))
+onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
 const currentFilter = ref('Todos')
+const filters = ['Todos', 'Vue', 'Nest.js', 'MongoDB', 'Python', 'AI']
 
-const projects = ref([
-  {
-    title: 'TuZona App',
-    image: '/img/tuZona.png',
-    desc: 'Plataforma de estudio interactiva con generación de exámenes y retos mediante inteligencia artificial. Optimizada para rendimiento y escalabilidad.',
-    tags: ['Vue', 'Nest.js', 'MongoDB'],
-    url: 'https://www.ponteaprobados.es',
-    github: '#'
-  },
-  {
-    title: 'PicsView App',
-    image: '/img/picsView.png',
-    desc: 'Sistema de gestión de datos en tiempo real. Utiliza Firebase para la autenticación y almacenamiento, con una interfaz fluida gestionada por Pinia.',
-    tags: ['Vue', 'Pinia', 'Firebase'],
-    url: 'https://firebase-firestore-pinia-favoritos.vercel.app',
-    github: '#'
-  },
-  {
-    title: 'WorkSpace App',
-    image: '/img/workSpace.png',
-    desc: 'E-commerce conceptual con un enfoque minimalista. Implementación avanzada de layouts con CSS Grid y transiciones suaves.',
-    tags: ['CSS', 'Pinia', 'Vue'],
-    url: 'https://workspace-kappa-wheat.vercel.app',
-    github: '#'
-  }
-])
+const projects = ref(projectsData)
 
 const filteredProjects = computed(() => {
   if (currentFilter.value === 'Todos') return projects.value
@@ -105,134 +108,346 @@ const filteredProjects = computed(() => {
 </script>
 
 <style lang="sass" scoped>
-$bg-dark: #151517
-$bg-card: #1e1e24
-$primary-green: #5cdb95
-$text-white: #ffffff
-$text-gray: #a0a0a0
-$border-color: #333
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap')
 
-.projects-header
-  padding: 60px 5% 40px
-  background-image: linear-gradient(rgba($text-white, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba($text-white, 0.03) 1px, transparent 1px)
-  background-size: 50px 50px
-  border-bottom: 1px solid $border-color
+$ink:       #0e0e0e
+$parchment: #f2ede6
+$accent:    #d4603a
+$muted:     #7a7570
+$card:      #141210
+$border:    rgba(242,237,230,0.1)
 
-  .highlight
-    background: linear-gradient(90deg, $primary-green, #42b883)
-    -webkit-background-clip: text
-    -webkit-text-fill-color: transparent
+// ─── NAVBAR ────────────────────────────────────────────────
+.navbar
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  z-index: 100
+  display: flex
+  align-items: center
+  justify-content: space-between
+  padding: 28px 60px
+  transition: all 0.4s ease
 
-  .filter-bar
-    margin-top: 30px
+  &.scrolled
+    background: rgba($ink, 0.92)
+    backdrop-filter: blur(12px)
+    padding: 18px 60px
+    border-bottom: 1px solid $border
+
+  .logo
+    font-family: 'Playfair Display', serif
+    font-size: 1.4rem
+    font-weight: 900
+    color: $accent
+    text-decoration: none
+    letter-spacing: 0.05em
+
+  nav
     display: flex
-    gap: 10px
-    flex-wrap: wrap
+    gap: 40px
 
-    .filter-btn
-      background: transparent
-      border: 1px solid $border-color
-      color: $text-gray
-      padding: 8px 20px
-      border-radius: 25px
-      cursor: pointer
-      transition: all 0.3s
+    a
+      color: rgba($parchment, 0.55)
+      text-decoration: none
+      font-size: 0.875rem
+      font-weight: 500
+      letter-spacing: 0.04em
+      transition: color 0.25s
+      position: relative
+
+      &::after
+        content: ''
+        position: absolute
+        bottom: -4px
+        left: 0
+        width: 0
+        height: 1px
+        background: $accent
+        transition: width 0.3s ease
 
       &:hover, &.active
-        border-color: $primary-green
-        color: $primary-green
-        background: rgba($primary-green, 0.05)
+        color: $parchment
+        &::after
+          width: 100%
 
-.projects-grid
-  display: grid
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr))
-  gap: 40px
-  padding: 60px 5%
-
-.project-card-large
-  background: $bg-card
-  border: 1px solid $border-color
-  border-radius: 20px
-  overflow: hidden
-  transition: transform 0.4s ease
-
-  &:hover
-    transform: translateY(-10px)
-    border-color: rgba($primary-green, 0.4)
-
-  .project-visual
-    height: 250px
-    position: relative
-    overflow: hidden
-    background: #2a2a30
-
-    img
-      width: 100%
-      height: 100%
-      object-fit: cover
-      transition: transform 0.6s ease
-
-    .overlay
-      position: absolute
-      top: 0
-      left: 0
-      width: 100%
-      height: 100%
-      background: rgba($bg-dark, 0.8)
-      display: flex
-      align-items: center
-      justify-content: center
-      opacity: 0
-      transition: opacity 0.3s ease
+  .nav-cta
+    font-size: 0.8rem
+    font-weight: 500
+    letter-spacing: 0.08em
+    text-transform: uppercase
+    color: $ink
+    background: $accent
+    text-decoration: none
+    padding: 9px 22px
+    border-radius: 2px
+    transition: all 0.25s
 
     &:hover
-      .overlay
+      background: lighten($accent, 8%)
+
+// ─── PAGE HERO ─────────────────────────────────────────────
+.page-hero
+  padding: 160px 60px 80px
+  border-bottom: 1px solid $border
+
+  .page-hero-inner
+    max-width: 700px
+
+  .page-label
+    font-family: 'DM Mono', monospace
+    font-size: 0.72rem
+    color: $muted
+    letter-spacing: 0.15em
+    text-transform: uppercase
+    display: block
+    margin-bottom: 24px
+
+  h1
+    font-family: 'Playfair Display', serif
+    font-size: clamp(3rem, 7vw, 6rem)
+    font-weight: 900
+    line-height: 1.0
+    margin-bottom: 24px
+    letter-spacing: -0.02em
+
+    em
+      font-style: italic
+      color: $accent
+
+  p
+    font-size: 1.1rem
+    color: rgba($parchment, 0.6)
+    line-height: 1.7
+    max-width: 460px
+
+// ─── FILTERS ───────────────────────────────────────────────
+.filter-bar
+  display: flex
+  gap: 0
+  padding: 0 60px
+  border-bottom: 1px solid $border
+  overflow-x: auto
+  scrollbar-width: none
+
+  &::-webkit-scrollbar
+    display: none
+
+  .filter-btn
+    background: transparent
+    border: none
+    border-bottom: 2px solid transparent
+    color: $muted
+    font-family: 'DM Mono', monospace
+    font-size: 0.75rem
+    letter-spacing: 0.1em
+    text-transform: uppercase
+    padding: 20px 28px
+    cursor: pointer
+    transition: all 0.25s
+    white-space: nowrap
+
+    &:hover
+      color: $parchment
+
+    &.active
+      color: $accent
+      border-bottom-color: $accent
+
+    &:focus-visible
+      outline: 2px solid $accent
+      outline-offset: -2px
+
+// ─── PROJECTS GRID ─────────────────────────────────────────
+.projects-grid
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 32px
+  margin: 60px
+
+  .project-card
+    width: 360px
+    max-width: 100%
+    background: $ink
+    border: 1px solid $border
+    display: flex
+    flex-direction: column
+    transition: background 0.3s
+
+    &:hover
+      background: $card
+      .card-visual img
+        transform: scale(1.04)
+      .card-overlay
         opacity: 1
+      .card-title
+        color: $accent
+
+    .card-visual
+      aspect-ratio: 16/9
+      overflow: hidden
+      position: relative
+      background: $card
+      border-bottom: 1px solid $border
+
       img
-        transform: scale(1.1)
+        width: 100%
+        height: 100%
+        object-fit: cover
+        transition: transform 0.6s ease
+        display: block
 
-  .project-info
-    padding: 30px
-
-    h3
-      font-size: 1.5rem
-      margin: 15px 0
-      color: $text-white
-
-    p
-      color: $text-gray
-      line-height: 1.6
-      font-size: 0.95rem
-      margin-bottom: 20px
-
-    .project-tags
-      display: flex
-      gap: 10px
-
-      .tag
-        font-size: 0.75rem
-        color: $primary-green
-        background: rgba($primary-green, 0.1)
-        padding: 4px 12px
-        border-radius: 15px
-
-    .project-footer
-      border-top: 1px solid $border-color
-      padding-top: 20px
-
-      .github-link
-        color: $text-gray
-        text-decoration: none
+      .card-placeholder
+        width: 100%
+        height: 100%
         display: flex
         align-items: center
-        gap: 8px
-        font-size: 0.9rem
-        transition: color 0.3s
+        justify-content: center
+        background: darken($card, 2%)
+
+        span
+          font-family: 'Playfair Display', serif
+          font-size: 5rem
+          font-weight: 900
+          color: rgba($parchment, 0.05)
+
+      .card-overlay
+        position: absolute
+        inset: 0
+        background: rgba($ink, 0.75)
+        display: flex
+        align-items: center
+        justify-content: center
+        opacity: 0
+        transition: opacity 0.3s
+
+        a
+          color: $parchment
+          font-family: 'DM Mono', monospace
+          font-size: 0.85rem
+          letter-spacing: 0.1em
+          text-transform: uppercase
+          text-decoration: none
+          border-bottom: 1px solid rgba($parchment, 0.4)
+          padding-bottom: 4px
+
+    .card-body
+      padding: 28px 32px 32px
+      flex-grow: 1
+      display: flex
+      flex-direction: column
+
+    .card-meta
+      display: flex
+      justify-content: space-between
+      align-items: center
+      margin-bottom: 16px
+
+    .card-tags
+      display: flex
+      gap: 10px
+      flex-wrap: wrap
+
+      .tag
+        font-family: 'DM Mono', monospace
+        font-size: 0.65rem
+        color: $muted
+        letter-spacing: 0.08em
+        text-transform: uppercase
+
+    .card-index
+      font-family: 'Playfair Display', serif
+      font-size: 0.7rem
+      color: rgba($muted, 0.4)
+      letter-spacing: 0.1em
+
+    .card-title
+      font-family: 'Playfair Display', serif
+      font-size: 1.6rem
+      font-weight: 700
+      margin-bottom: 12px
+      transition: color 0.25s
+      line-height: 1.2
+
+    .card-desc
+      font-size: 0.9rem
+      color: rgba($parchment, 0.55)
+      line-height: 1.7
+      flex-grow: 1
+      margin-bottom: 28px
+
+    .card-footer
+      display: flex
+      gap: 20px
+      border-top: 1px solid $border
+      padding-top: 20px
+
+    .card-link
+      display: inline-flex
+      align-items: center
+      gap: 8px
+      font-family: 'DM Mono', monospace
+      font-size: 0.75rem
+      letter-spacing: 0.08em
+      text-transform: uppercase
+      color: $parchment
+      text-decoration: none
+      background: $accent
+      padding: 9px 18px
+      border-radius: 2px
+      transition: all 0.25s
+
+      &:hover
+        background: lighten($accent, 8%)
+
+      &.ghost
+        background: transparent
+        color: $muted
+        padding: 9px 0
 
         &:hover
-          color: $text-white
+          color: $parchment
 
-@media (max-width: 600px)
+      &:focus-visible
+        outline: 2px solid $parchment
+        outline-offset: 3px
+
+// ─── EMPTY STATE ───────────────────────────────────────────
+.empty-state
+  text-align: center
+  padding: 80px 60px
+  color: $muted
+  font-family: 'DM Mono', monospace
+  font-size: 0.9rem
+
+  em
+    color: $accent
+    font-style: italic
+
+// ─── RESPONSIVE ────────────────────────────────────────────
+@media (max-width: 900px)
+  .navbar
+    padding: 22px 24px
+    &.scrolled
+      padding: 16px 24px
+    nav, .nav-cta
+      display: none
+
+  .page-hero
+    padding: 120px 24px 60px
+
+  .filter-bar
+    padding: 0 24px
+
   .projects-grid
-    grid-template-columns: 1fr
+    margin: 40px 24px
+    gap: 24px
+
+  .project-card
+    width: 100%
+
+  .card-body
+    padding: 24px !important
 </style>

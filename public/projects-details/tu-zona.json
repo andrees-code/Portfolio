@@ -1,0 +1,9 @@
+{
+  "rol": "Full Stack Developer",
+  "duracion": "3 meses",
+  "descripcion_larga": "TuZona App nació con la necesidad de... Aquí puedes explayarte todo lo que quieras sobre el problema, la solución y la arquitectura.",
+  "retos": [
+    "Integración de la IA para generar respuestas en tiempo real.",
+    "Optimización de consultas en MongoDB."
+  ]
+}

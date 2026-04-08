@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev:frontend": "vite",
+    "dev:backend": "node server/index.js",
+    "dev": "npm-run-all2 --parallel dev:frontend dev:backend",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "run-s lint:*",
@@ -13,6 +15,10 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.4",
     "pinia": "^3.0.4",
     "sass": "^1.97.3",
     "vue": "^3.5.27",

@@ -1,692 +1,965 @@
 <template>
   <main class="portfolio-container">
-    <header class="navbar">
-      <div class="logo">Portfolio</div>
-      <nav>
-        <a href="/home" class="active">Home</a>
-        <a href="/projects">Projects</a>
-        <a href="/skills">Skills</a>
-        <a href="/contact">Contact</a>
+
+    <!-- NAV -->
+    <header class="navbar" :class="{ scrolled: isScrolled }">
+      <router-link to="/" class="logo" aria-label="Inicio">AB</router-link>
+      <nav aria-label="Navegación principal">
+        <router-link to="/" exact-active-class="active" active-class="active">Inicio</router-link>
+        <router-link to="/projects" active-class="active">Proyectos</router-link>
+        <router-link to="/skills" active-class="active">Skills</router-link>
+        <router-link to="/contacto" active-class="active">Contacto</router-link>
       </nav>
-      <div class="search-icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </div>
+      <router-link to="/contacto" class="nav-cta" aria-label="Contactar a Andrés">Hablemos</router-link>
     </header>
 
-    <section class="hero">
-      <div class="hero-content">
-        <div class="profile-icon">A.B.</div>
-        <h1>
-          Hola, Soy Andres,<br />
-          <span class="highlight">Full Stack Developer</span>
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-eyebrow">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Disponible para proyectos</span>
+      </div>
+
+      <div class="hero-main">
+        <div class="hero-number" aria-hidden="true">01</div>
+        <h1 id="hero-title" class="hero-title">
+          <span class="line-small">Hola, soy</span>
+          <span class="line-big">Andrés</span>
+          <span class="line-role">Full Stack Developer</span>
         </h1>
-        <p class="subtitle">Convirtiendo café en código ☕️</p>
-
-        <div class="hero-buttons">
-          <button class="btn btn-primary">Ver Proyectos</button>
-          <button class="btn btn-outline">Contactame</button>
+        <div class="hero-side">
+          <p class="hero-desc">
+            Construyo experiencias digitales que funcionan de verdad. Desde la interfaz hasta el servidor, con café y sin excusas.
+          </p>
+          <div class="hero-actions">
+            <router-link to="/projects" class="btn-primary">Ver proyectos</router-link>
+            <router-link to="/contacto" class="btn-ghost">Contactar</router-link>
+          </div>
         </div>
       </div>
 
-      <div class="hero-visual">
-        <div class="scene">
-          <div class="cube">
-            <div class="face front"></div>
-            <div class="face back"></div>
-            <div class="face right"></div>
-            <div class="face left"></div>
-            <div class="face top"></div>
-            <div class="face bottom"></div>
+      <div class="hero-meta" aria-label="Información de ubicación y stack">
+        <span>Valencia, España</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>Vue · Nest.js · MongoDB · Python</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>Remoto friendly</span>
+      </div>
+
+      <div class="hero-scroll" aria-hidden="true">
+        <div class="scroll-line"></div>
+        <span>scroll</span>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="projects-section" aria-labelledby="projects-title">
+      <div class="section-header">
+        <div class="section-number" aria-hidden="true">02</div>
+        <h2 id="projects-title">Proyectos Destacados</h2>
+        <router-link to="/projects" class="section-link" aria-label="Ver todos los proyectos">Ver todos →</router-link>
+      </div>
+
+      <div class="projects-list" role="list">
+      <article
+        v-for="(project, index) in projects"
+        :key="index"
+        class="project-row clickable"
+        role="listitem"
+        @click="openModal(project)"
+      >
+        <div class="project-index" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</div>
+
+        <div class="project-thumb" aria-hidden="true">
+          <img v-if="project.image" :src="project.image" :alt="'Captura de ' + project.title" />
+          <div v-else class="thumb-placeholder"></div>
+        </div>
+
+        <div class="project-content">
+          <div class="project-tags" role="list" :aria-label="'Tecnologías de ' + project.title">
+            <span v-for="tag in project.tags" :key="tag" class="tag" role="listitem">{{ tag }}</span>
+          </div>
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-desc">{{ project.desc }}</p>
+        </div>
+
+        <a :href="project.url" target="_blank" rel="noopener noreferrer" class="project-arrow" aria-label="Abrir demo" @click.stop>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </a>
+      </article>
+    </div>
+
+    <div v-if="isModalOpen" class="modal-backdrop" @click="closeModal">
+      <div class="modal-container" @click.stop>
+        <button class="modal-close" @click="closeModal" aria-label="Cerrar modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+
+        <div v-if="isLoadingDetails" class="modal-loading">
+          Cargando detalles...
+        </div>
+
+        <div v-else-if="activeProject" class="modal-body">
+          <span class="modal-eyebrow">{{ activeProject.rol }} · {{ activeProject.duracion }}</span>
+          <h2>{{ activeProject.title }}</h2>
+          <img v-if="activeProject.image" :src="activeProject.image" class="modal-hero-img" alt="" />
+
+          <div class="modal-text">
+            <p>{{ activeProject.descripcion_larga }}</p>
+
+            <h3 v-if="activeProject.retos">Retos Técnicos</h3>
+            <ul v-if="activeProject.retos" class="modal-list">
+              <li v-for="(reto, idx) in activeProject.retos" :key="idx">{{ reto }}</li>
+            </ul>
+          </div>
+
+          <a :href="activeProject.url" target="_blank" class="btn-primary" style="margin-top: 24px;">Visitar Proyecto</a>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <!-- ABOUT STRIP -->
+    <section class="about-strip" aria-label="Sobre Andrés">
+      <div class="strip-inner">
+        <div class="strip-text">
+          <div class="section-number" aria-hidden="true">03</div>
+          <h2>Un poco sobre mí</h2>
+          <p>
+            Soy un desarrollador Full Stack formado en Valencia, apasionado por crear productos que resuelven problemas reales.
+            Me muevo igual de cómodo en el frontend que en el backend, y disfruto especialmente diseñando arquitecturas limpias y escalables.
+          </p>
+          <p>
+            Cuando no estoy programando, probablemente estoy pensando en cómo mejorar lo que acabo de programar.
+          </p>
+        </div>
+        <div class="strip-stats" role="list" aria-label="Estadísticas">
+          <div class="stat" role="listitem">
+            <span class="stat-number" aria-label="3 proyectos publicados">3</span>
+            <span class="stat-label">Proyectos publicados</span>
+          </div>
+          <div class="stat" role="listitem">
+            <span class="stat-number" aria-label="5 tecnologías">5+</span>
+            <span class="stat-label">Tecnologías</span>
+          </div>
+          <div class="stat" role="listitem">
+            <span class="stat-number" aria-label="100 porciento remoto">100%</span>
+            <span class="stat-label">Remoto</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="projects-section">
-      <h2>Proyectos Destacados</h2>
-      <div class="projects-grid">
-        <div v-for="(project, index) in projects" :key="index" class="project-card">
-          <div class="card-image">
-            <img v-if="project.image" :src="project.image" :alt="project.title" />
-            <div v-else class="cross-icon"></div>
-          </div>
-
-          <div class="card-content">
-            <h3>{{ project.title }}</h3>
-            <p>{{ project.desc }}</p>
-            <div class="card-actions">
-              <a :href="project.url" target="_blank" rel="noopener noreferrer">
-                <button class="btn-small">Ver Demo</button>
-              </a>
-
-              <div class="tags">
-                <span v-for="tag in project.tags" :key="tag" class="tag">{{ tag }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- CONTACT TEASER -->
+    <section class="contact-teaser" aria-labelledby="contact-title">
+      <div class="section-number" aria-hidden="true">04</div>
+      <h2 id="contact-title">¿Empezamos algo?</h2>
+      <p>Estoy abierto a proyectos freelance, posiciones full-time y colaboraciones interesantes.</p>
+      <router-link to="/contacto" class="btn-primary large" aria-label="Ir a la página de contacto">Escríbeme</router-link>
+      <div class="contact-links" aria-label="Redes sociales">
+        <a href="https://github.com/andrees-code" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/andrés-blasco-aleixos-b06853282" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:blasco.ivia@gmail.com">blasco.ivia@gmail.com</a>
       </div>
     </section>
 
-    <section class="contact-section">
-      <h2>Contact Me</h2>
-      <div class="contact-container">
-        <div class="tech-stack">
-          <div class="tech-circle active">
-            <svg viewBox="0 0 128 128" width="24" height="24">
-              <path fill="#42b883" d="M78.8,10L64,35.4L49.2,10H0l64,110l64-110H78.8z" />
-              <path fill="#35495e" d="M78.8,10L64,35.4L49.2,10H22l42,72l42-72H78.8z" />
-            </svg>
-            Vue
-          </div>
-
-          <div class="tech-circle active">
-            <svg viewBox="0 0 128 128" width="24" height="24">
-              <path fill="#E0234E" d="M64 4.6L12.4 31.7v64.6L64 123.4l51.6-27.1V31.7L64 4.6z" />
-              <path fill="#fff" d="M64 74.4L37.1 58.9l26.9-15.5 26.9 15.5L64 74.4z" opacity="0.6" />
-            </svg>
-            Nest.js
-          </div>
-
-          <div class="tech-circle active">
-            <svg viewBox="0 0 128 128" width="24" height="24">
-              <path
-                fill="#3776AB"
-                d="M64 12c-18.4 0-24 9.6-24 9.6V35h24v3.6H28S12 37.6 12 64c0 19.6 12.8 20.8 12.8 20.8h6.8v-8.8s-.4-10.4 10.4-10.4h24.4c10.4 0 10.4-10.4 10.4-10.4V29.6s.4-17.6-12.8-17.6zm-10 12a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"
-              />
-              <path
-                fill="#FFD43B"
-                d="M91.2 43.2H84.4v8.8s.4 10.4-10.4 10.4H49.6c-10.4 0-10.4 10.4-10.4 10.4v25.2s-.4 17.6 12.8 17.6c18.4 0 24-9.6 24-9.6V93h-24v-3.6h36s16 1.2 16-25.2c0-19.6-12.8-20.8-12.8-20.8zm1.2 60.8a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"
-              />
-            </svg>
-            Python
-          </div>
-
-          <div class="tech-circle active">
-            <svg viewBox="0 0 128 128" width="24" height="24">
-              <path
-                fill="#FFC107"
-                d="M21.8 98L32.6 30.6c.3-1.8 2.6-2.2 3.5-.6l18.4 34.6L21.8 98z"
-              />
-              <path
-                fill="#FFA000"
-                d="M68.5 60.5l-14-25.9c-.9-1.6-3.2-1.3-3.5.6L44.5 64.6l24 4.1-24-4.1 24-4.1z"
-              />
-              <path fill="#FFCA28" d="M68.5 60.5L95.2 9.6c.9-1.8-1.5-3.6-3-2.1L54.5 64.6l14-4.1z" />
-              <path
-                fill="#F57C00"
-                d="M21.8 98l42.2 25.5c2.3 1.4 5.3 1.4 7.6 0L114.2 98 68.5 60.5 21.8 98z"
-              />
-            </svg>
-            Firebase
-          </div>
-
-          <div class="tech-circle active">
-            <svg viewBox="0 0 128 128" width="24" height="24">
-              <path
-                fill="#4DB33D"
-                d="M64 4C64 4 32 50 32 78c0 20 12 38 32 46 20-8 32-26 32-46C96 50 64 4 64 4z"
-              />
-              <path fill="#3F9132" d="M64 124c-12-6-24-20-24-46 0-30 24-74 24-74v120z" />
-            </svg>
-            MongoDB
-          </div>
-
-          <div class="tech-circle active">
-            <svg
-              viewBox="0 0 24 24"
-              width="24"
-              height="24"
-              fill="none"
-              stroke="#fff"
-              stroke-width="2"
-            >
-              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-              <line x1="6" y1="6" x2="6" y2="6"></line>
-              <line x1="6" y1="18" x2="6" y2="18"></line>
-            </svg>
-            APIs
-          </div>
-        </div>
-
-        <form class="contact-form" @submit.prevent>
-          <div class="form-group">
-            <label>Name</label>
-            <input type="text" placeholder="Your Name" />
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" placeholder="email@example.com" />
-          </div>
-          <div class="form-group">
-            <label>Message</label>
-            <textarea placeholder="Your message..."></textarea>
-          </div>
-
-          <div class="form-footer">
-            <button class="btn btn-primary btn-full">Send Message</button>
-            <div class="social-icons">
-            <a href="https://www.linkedin.com/in/andrés-blasco-aleixos-b06853282" target="_blank" rel="noopener noreferrer">
-              <span class="soc">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                  <rect x="2" y="9" width="4" height="12"></rect>
-                  <circle cx="4" cy="4" r="2"></circle>
-                </svg>
-              </span>
-            </a>
-
-            <a href="https://github.com/andrees-code" target="_blank" rel="noopener noreferrer">
-              <span class="soc">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                </svg>
-              </span>
-            </a>
-          </div>
-          </div>
-        </form>
-      </div>
-    </section>
   </main>
 </template>
-
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import projectsData from '../assets/projects.json'
 
-const projects = ref([
-  {
-    title: 'TuZona App',
-    image: '/img/tuZona.png',
-    desc: 'Plataforma de estudio interactiva con generacion de examenes y retos con ia.',
-    tags: ['Vue', 'Nest.js', 'MongoDB'],
-    url: 'https://www.ponteaprobados.es',
-  },
-  {
-    title: 'PicsView App',
-    image: '/img/picsView.png',
-    desc: 'Sistema de gestión de datos con firebase, firestore y pinia.',
-    tags: ['Vue', 'Pinia', 'firebase'],
-    url: 'https://firebase-firestore-pinia-favoritos.vercel.app',
-  },
-  {
-    title: 'WorkSpace App',
-    image:
-      '/img/workSpace.png',
-    desc: 'Interfaz moderna para tienda online.',
-    tags: ['CSS', 'Pinia'],
-    url: 'https://workspace-kappa-wheat.vercel.app',
-  },
-])
+const projects = computed(() => {
+  return projectsData.filter(project => project.destacados)
+})
+
+const isScrolled = ref(false)
+const handleScroll = () => { isScrolled.value = window.scrollY > 40 }
+
+onMounted(() => window.addEventListener('scroll', handleScroll))
+onUnmounted(() => window.removeEventListener('scroll', handleScroll))
+
+// --- ESTADO DEL MODAL ---
+const isModalOpen = ref(false)
+const activeProject = ref(null)
+const isLoadingDetails = ref(false)
+
+const openModal = async (projectBase) => {
+  isModalOpen.value = true
+  isLoadingDetails.value = true
+
+  try {
+    // Usamos fetch nativo apuntando a la carpeta public
+    const response = await fetch(`/projects-details/${projectBase.id}.json`)
+
+    // Si el archivo no existe (ej. error 404), lanzamos un error para ir al catch
+    if (!response.ok) throw new Error('Archivo JSON no encontrado')
+
+    // Convertimos la respuesta a JSON
+    const extraData = await response.json()
+
+    // Fusionamos la info principal con la del JSON individual
+    activeProject.value = { ...projectBase, ...extraData }
+
+  } catch (error) {
+    console.error(`Fallo al cargar detalles de ${projectBase.id}:`, error)
+    // Fallback: Si falla, mostramos la info básica de la tarjeta
+    activeProject.value = { ...projectBase, descripcion_larga: projectBase.desc }
+  } finally {
+    isLoadingDetails.value = false
+    document.body.style.overflow = 'hidden' // Bloquea el scroll del fondo
+  }
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
+  setTimeout(() => { activeProject.value = null }, 300) // Limpiar tras la animación
+  // Restaurar el scroll
+  document.body.style.overflow = 'auto'
+}
 </script>
-
 <style lang="sass">
-// Variables
-$bg-dark: #151517
-$bg-card: #1e1e24
-$primary-green: #5cdb95
-$text-white: #ffffff
-$text-gray: #a0a0a0
-$border-color: #333
+// ─── TOKENS ────────────────────────────────────────────────
+$ink:       #0e0e0e
+$parchment: #f2ede6
+$accent:    #d4603a
+$muted:     #7a7570
+$card:      #171512
+$border:    rgba(242,237,230,0.1)
 
-// Reset & Base
-*
+// ─── GOOGLE FONTS ──────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap')
+
+// ─── RESET ─────────────────────────────────────────────────
+*, *::before, *::after
   box-sizing: border-box
   margin: 0
   padding: 0
 
+html
+  scroll-behavior: smooth
+
 body
-  background-color: $bg-dark
-  color: $text-white
-  font-family: 'Inter', sans-serif
+  background: $ink
+  color: $parchment
+  font-family: 'DM Sans', sans-serif
+  font-size: 16px
+  line-height: 1.6
   overflow-x: hidden
+  -webkit-font-smoothing: antialiased
 
+// ─── LAYOUT ────────────────────────────────────────────────
 .portfolio-container
-  max-width: 1200px
-  margin: 0 auto
-  padding: 20px
-  border-left: 1px solid rgba(255, 255, 255, 0.05)
-  border-right: 1px solid rgba(255, 255, 255, 0.05)
   min-height: 100vh
-  // Añadido para que el fondo del hero no se salga
-  position: relative
-  overflow: hidden
 
-// Navbar
+// ─── NAVBAR ────────────────────────────────────────────────
 .navbar
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  z-index: 100
   display: flex
-  justify-content: space-between
   align-items: center
-  padding: 20px 0
-  // Reducido el margen inferior para que el hero suba un poco más
-  margin-bottom: 20px
-  position: relative
-  z-index: 10
+  justify-content: space-between
+  padding: 28px 60px
+  transition: all 0.4s ease
+
+  &.scrolled
+    background: rgba($ink, 0.92)
+    backdrop-filter: blur(12px)
+    padding: 18px 60px
+    border-bottom: 1px solid $border
 
   .logo
-    font-size: 1.5rem
-    font-weight: 700
-    color: $text-white
+    font-family: 'Playfair Display', serif
+    font-size: 1.4rem
+    font-weight: 900
+    color: $accent
+    text-decoration: none
+    letter-spacing: 0.05em
+    &:focus-visible
+      outline: 2px solid $accent
+      outline-offset: 4px
+      border-radius: 2px
 
   nav
     display: flex
-    gap: 30px
+    gap: 40px
 
     a
-      color: $text-gray
+      color: rgba($parchment, 0.55)
       text-decoration: none
-      font-size: 0.9rem
+      font-size: 0.875rem
+      font-weight: 500
+      letter-spacing: 0.04em
+      transition: color 0.25s
       position: relative
-      transition: color 0.3s
 
-      &:hover, &.active
-        color: $text-white
-
-      &.active::after
+      &::after
         content: ''
         position: absolute
-        bottom: -5px
+        bottom: -4px
         left: 0
-        width: 100%
-        height: 2px
-        background-color: $primary-green
+        width: 0
+        height: 1px
+        background: $accent
+        transition: width 0.3s ease
 
-  .search-icon
-    color: $text-gray
-    cursor: pointer
-    transition: color 0.3s
+      &:hover, &.active
+        color: $parchment
+
+        &::after
+          width: 100%
+
+      &:focus-visible
+        outline: 2px solid $accent
+        outline-offset: 6px
+        border-radius: 2px
+
+  .nav-cta
+    font-size: 0.8rem
+    font-weight: 500
+    letter-spacing: 0.08em
+    text-transform: uppercase
+    color: $ink
+    background: $accent
+    text-decoration: none
+    padding: 9px 22px
+    border-radius: 2px
+    transition: all 0.25s
+
     &:hover
-      color: $primary-green
+      background: lighten($accent, 8%)
 
-// Hero Section (MODIFICADO PARA CENTRADO Y FONDO)
+    &:focus-visible
+      outline: 2px solid $parchment
+      outline-offset: 3px
+
+// ─── HERO ──────────────────────────────────────────────────
 .hero
+  min-height: 100vh
   display: flex
-  align-items: center // Centra verticalmente los hijos
-  justify-content: space-between
-  // Eliminado padding-top fijo
-  // padding-top: 40px
-  margin-bottom: 100px
-  // Altura mínima para que el centrado vertical funcione bien
-  min-height: 60vh
-  position: relative
-
-  // FONDO DE CUADRÍCULA TECNOLÓGICA
-  background-image: linear-gradient(rgba($text-white, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba($text-white, 0.03) 1px, transparent 1px)
-  background-size: 50px 50px // Tamaño de los cuadros de la red
-
-  .hero-content
-    max-width: 50%
-    position: relative
-    z-index: 2 // Asegura que el texto esté sobre el fondo
-    margin-left: 5%
-
-    .profile-icon
-      width: 60px
-      height: 60px
-      background: $bg-card
-      border-radius: 50%
-      display: flex
-      align-items: center
-      justify-content: center
-      font-size: 1.5rem
-      border: 1px solid $border-color
-      margin-bottom: 20px
-      font-family: serif
-      color: $primary-green
-      box-shadow: 0 0 15px rgba($primary-green, 0.2)
-
-    h1
-      font-size: 2.5rem
-      line-height: 1.2
-      margin-bottom: 15px
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5)
-
-    .highlight
-      display: block
-      margin-top: 5px
-      background: linear-gradient(90deg, $primary-green, #42b883)
-      -webkit-background-clip: text
-      -webkit-text-fill-color: transparent
-
-    .subtitle
-      color: $text-gray
-      margin-bottom: 30px
-      font-size: 1.1rem
-
-    .hero-buttons
-      display: flex
-      gap: 15px
-
-// 3D CUBE ANIMATION & GLOW BACKGROUND
-.hero-visual
-  width: 40%
-  height: 300px
-  display: flex
+  flex-direction: column
   justify-content: center
-  align-items: center
-  perspective: 1000px
-  position: relative // Necesario para el glow absolute
-  z-index: 1
+  padding: 160px 60px 80px
+  position: relative
+  border-bottom: 1px solid $border
 
-  // EL RESPLANDOR VERDE DETRÁS DEL CUBO
+  // Subtle grain texture overlay
   &::before
     content: ''
     position: absolute
-    top: 50%
-    left: 50%
-    transform: translate(-50%, -50%)
-    width: 350px
-    height: 350px
-    // Gradiente radial que se desvanece
-    background: radial-gradient(circle, rgba($primary-green, 0.25) 0%, rgba($bg-dark, 0) 70%)
-    filter: blur(60px) // Desenfoque fuerte para el efecto glow
-    z-index: -1 // Detrás del cubo
+    inset: 0
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")
+    pointer-events: none
 
-  .scene
-    width: 150px
-    height: 150px
-    position: relative
-    transform-style: preserve-3d
-    animation: rotateCube 12s infinite linear
+  .hero-eyebrow
+    display: flex
+    align-items: center
+    gap: 10px
+    font-family: 'DM Mono', monospace
+    font-size: 0.75rem
+    color: $muted
+    letter-spacing: 0.1em
+    text-transform: uppercase
+    margin-bottom: 48px
 
-  .cube
-    width: 100%
-    height: 100%
-    position: absolute
-    transform-style: preserve-3d
+    .status-dot
+      width: 8px
+      height: 8px
+      border-radius: 50%
+      background: #4ade80
+      flex-shrink: 0
+      animation: pulse-dot 2.5s ease infinite
 
-    .face
-      position: absolute
-      width: 150px
-      height: 150px
-      border: 2px solid $primary-green
-      background: rgba($primary-green, 0.05) // Un poco más transparente
-      box-shadow: 0 0 20px rgba($primary-green, 0.4) inset, 0 0 5px rgba($primary-green, 0.2) // Brillo interno y externo
-      backface-visibility: visible
-
-      &.front
-        transform: translateZ(75px)
-      &.back
-        transform: rotateY(180deg) translateZ(75px)
-      &.right
-        transform: rotateY(90deg) translateZ(75px)
-      &.left
-        transform: rotateY(-90deg) translateZ(75px)
-      &.top
-        transform: rotateX(90deg) translateZ(75px)
-      &.bottom
-        transform: rotateX(-90deg) translateZ(75px)
-
-@keyframes rotateCube
-  0%
-    transform: rotateX(-20deg) rotateY(0deg)
-  100%
-    transform: rotateX(-20deg) rotateY(360deg)
-
-// Buttons
-.btn
-  padding: 12px 28px
-  border-radius: 6px
-  font-weight: 600
-  cursor: pointer
-  transition: all 0.3s
-  border: none
-  font-size: 0.9rem
-
-  &-primary
-    background-color: $primary-green
-    color: #151517
-    box-shadow: 0 0 15px rgba($primary-green, 0.3)
-    &:hover
-      background-color: lighten($primary-green, 10%)
-      transform: translateY(-2px)
-      box-shadow: 0 0 25px rgba($primary-green, 0.5)
-
-  &-outline
-    background-color: transparent
-    border: 1px solid $text-gray
-    color: $text-white
-    &:hover
-      border-color: $text-white
-      background-color: rgba(255,255,255,0.05)
-
-// Projects Section
-.projects-section
-  margin-bottom: 100px
-  position: relative
-  z-index: 2
-
-  h2
-    margin-bottom: 30px
-    font-size: 1.8rem
-    border-left: 4px solid $primary-green
-    padding-left: 15px
-
-  .projects-grid
+  .hero-main
     display: grid
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))
-    gap: 30px
+    grid-template-columns: 1fr 380px
+    gap: 80px
+    align-items: end
+    margin-bottom: 64px
 
-  .project-card
-    background-color: $bg-card
-    border: 1px solid $border-color
-    border-radius: 16px
-    padding: 20px
-    transition: transform 0.3s ease, border-color 0.3s ease
+  .hero-number
+    font-family: 'Playfair Display', serif
+    font-size: 10rem
+    font-weight: 900
+    color: rgba($parchment, 0.04)
+    position: absolute
+    top: 120px
+    right: 60px
+    line-height: 1
+    user-select: none
+    pointer-events: none
+
+  .hero-title
     display: flex
     flex-direction: column
 
+    .line-small
+      font-family: 'DM Mono', monospace
+      font-size: 0.9rem
+      color: $muted
+      letter-spacing: 0.12em
+      text-transform: uppercase
+      margin-bottom: 8px
+
+    .line-big
+      font-family: 'Playfair Display', serif
+      font-size: clamp(5rem, 10vw, 9rem)
+      font-weight: 900
+      line-height: 0.9
+      color: $parchment
+      letter-spacing: -0.02em
+
+    .line-role
+      font-family: 'Playfair Display', serif
+      font-style: italic
+      font-size: clamp(1.2rem, 2.5vw, 2rem)
+      color: $accent
+      margin-top: 16px
+      font-weight: 400
+
+  .hero-side
+    padding-bottom: 8px
+
+    .hero-desc
+      font-size: 1.05rem
+      color: rgba($parchment, 0.65)
+      line-height: 1.75
+      margin-bottom: 36px
+
+  .hero-actions
+    display: flex
+    gap: 16px
+    flex-wrap: wrap
+
+  .hero-meta
+    font-family: 'DM Mono', monospace
+    font-size: 0.72rem
+    color: $muted
+    letter-spacing: 0.06em
+    display: flex
+    align-items: center
+    gap: 14px
+    flex-wrap: wrap
+
+    .sep
+      color: rgba($muted, 0.5)
+
+  .hero-scroll
+    position: absolute
+    bottom: 40px
+    right: 60px
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: 10px
+    color: $muted
+    font-family: 'DM Mono', monospace
+    font-size: 0.65rem
+    letter-spacing: 0.15em
+    text-transform: uppercase
+
+    .scroll-line
+      width: 1px
+      height: 48px
+      background: linear-gradient($accent, transparent)
+      animation: line-drop 2s ease infinite
+
+// ─── BUTTONS ───────────────────────────────────────────────
+.btn-primary
+  display: inline-flex
+  align-items: center
+  background: $accent
+  color: $ink
+  font-weight: 600
+  font-size: 0.875rem
+  letter-spacing: 0.06em
+  text-transform: uppercase
+  text-decoration: none
+  padding: 13px 30px
+  border-radius: 2px
+  transition: all 0.25s
+  border: none
+  cursor: pointer
+
+  &:hover
+    background: lighten($accent, 8%)
+    transform: translateY(-2px)
+
+  &.large
+    padding: 17px 40px
+    font-size: 1rem
+
+  &:focus-visible
+    outline: 2px solid $parchment
+    outline-offset: 3px
+
+.btn-ghost
+  display: inline-flex
+  align-items: center
+  background: transparent
+  color: $parchment
+  font-weight: 500
+  font-size: 0.875rem
+  letter-spacing: 0.06em
+  text-transform: uppercase
+  text-decoration: none
+  padding: 13px 30px
+  border-radius: 2px
+  border: 1px solid rgba($parchment, 0.2)
+  transition: all 0.25s
+
+  &:hover
+    border-color: rgba($parchment, 0.5)
+    background: rgba($parchment, 0.04)
+
+  &:focus-visible
+    outline: 2px solid $accent
+    outline-offset: 3px
+
+// ─── SECTION SHARED ────────────────────────────────────────
+.section-number
+  font-family: 'Playfair Display', serif
+  font-size: 0.75rem
+  color: $accent
+  letter-spacing: 0.2em
+  font-weight: 400
+  font-style: italic
+
+.section-header
+  display: flex
+  align-items: baseline
+  gap: 20px
+  margin-bottom: 48px
+  padding: 0 60px
+  border-bottom: 1px solid $border
+  padding-bottom: 24px
+
+  h2
+    font-family: 'Playfair Display', serif
+    font-size: 2.2rem
+    font-weight: 700
+    flex-grow: 1
+
+  .section-link
+    font-family: 'DM Mono', monospace
+    font-size: 0.8rem
+    color: $accent
+    text-decoration: none
+    letter-spacing: 0.05em
+    transition: opacity 0.2s
+
     &:hover
-      transform: translateY(-5px)
-      border-color: rgba($primary-green, 0.5)
+      opacity: 0.7
 
-      .card-image img
-        transform: scale(1.05)
+    &:focus-visible
+      outline: 2px solid $accent
+      outline-offset: 4px
+      border-radius: 2px
 
-    .card-image
-      height: 180px
-      background-color: #2a2a30
-      border-radius: 12px
-      margin-bottom: 20px
-      position: relative
+// ─── PROJECTS ──────────────────────────────────────────────
+.projects-section
+  padding: 100px 0
+  border-bottom: 1px solid $border
+
+  .projects-list
+    padding: 0 60px
+
+  .project-row
+    display: grid
+    grid-template-columns: 48px 180px 1fr 60px
+    align-items: center
+    gap: 40px
+    padding: 32px 0
+    border-bottom: 1px solid $border
+    transition: all 0.3s
+    position: relative
+
+    &:last-child
+      border-bottom: none
+
+    &:hover
+      .project-title
+        color: $accent
+      .project-arrow
+        transform: translate(4px, -4px)
+        color: $accent
+      .project-thumb
+        opacity: 1
+
+    .project-index
+      font-family: 'DM Mono', monospace
+      font-size: 0.7rem
+      color: $muted
+      letter-spacing: 0.1em
+
+    .project-thumb
+      width: 120px
+      height: 72px
+      border-radius: 4px
       overflow: hidden
-      border: 1px solid $border-color
+      opacity: 0.6
+      transition: opacity 0.3s
+      flex-shrink: 0
 
       img
         width: 100%
         height: 100%
         object-fit: cover
-        display: block
-        transition: transform 0.5s ease
 
-      .cross-icon
+      .thumb-placeholder
         width: 100%
         height: 100%
+        background: $card
+        border: 1px solid $border
+
+    .project-content
+      .project-tags
         display: flex
-        align-items: center
-        justify-content: center
-
-        &::before, &::after
-          content: ''
-          position: absolute
-          width: 40px
-          height: 1px
-          background: $text-gray
-        &::before
-          transform: rotate(45deg)
-        &::after
-          transform: rotate(-45deg)
-
-    .card-content
-      flex-grow: 1
-      display: flex
-      flex-direction: column
-
-      h3
-        font-size: 1.2rem
+        gap: 8px
         margin-bottom: 10px
-        color: $text-white
+        flex-wrap: wrap
 
-      p
+        .tag
+          font-family: 'DM Mono', monospace
+          font-size: 0.65rem
+          color: $muted
+          letter-spacing: 0.08em
+          text-transform: uppercase
+
+      .project-title
+        font-family: 'Playfair Display', serif
+        font-size: 1.4rem
+        font-weight: 700
+        margin-bottom: 6px
+        transition: color 0.25s
+
+      .project-desc
         font-size: 0.9rem
-        color: $text-gray
-        margin-bottom: 20px
-        line-height: 1.5
-        flex-grow: 1
+        color: rgba($parchment, 0.55)
+        line-height: 1.6
 
-      .card-actions
-        display: flex
-        justify-content: space-between
-        align-items: center
-        margin-top: auto
+    .project-arrow
+      color: rgba($parchment, 0.3)
+      display: flex
+      align-items: center
+      justify-content: center
+      transition: all 0.3s
+      text-decoration: none
 
-        .btn-small
-          background: transparent
-          border: 1px solid $border-color
-          color: $text-white
-          padding: 8px 16px
-          border-radius: 20px
-          font-size: 0.8rem
-          cursor: pointer
-          transition: all 0.3s
-          &:hover
-            border-color: $primary-green
-            color: $primary-green
+      &:focus-visible
+        outline: 2px solid $accent
+        outline-offset: 4px
+        border-radius: 2px
 
-        .tags
-          display: flex
-          gap: 8px
-          flex-wrap: wrap
-          justify-content: flex-end
+// ─── ABOUT STRIP ───────────────────────────────────────────
+.about-strip
+  padding: 100px 60px
+  border-bottom: 1px solid $border
 
-          .tag
-            font-size: 0.7rem
-            color: $primary-green
-            background: rgba($primary-green, 0.1)
-            padding: 4px 10px
-            border-radius: 12px
-            font-weight: 500
+  .strip-inner
+    display: grid
+    grid-template-columns: 1fr 320px
+    gap: 80px
+    align-items: start
 
-// Contact Section
-.contact-section
-  border-top: 1px solid $border-color
-  padding-top: 60px
-  margin-bottom: 40px
-  position: relative
-  z-index: 2
+  .strip-text
+    .section-number
+      margin-bottom: 16px
+      display: block
+
+    h2
+      font-family: 'Playfair Display', serif
+      font-size: 2.5rem
+      font-weight: 700
+      margin-bottom: 24px
+      line-height: 1.15
+
+    p
+      font-size: 1rem
+      color: rgba($parchment, 0.65)
+      line-height: 1.8
+      margin-bottom: 16px
+
+      &:last-child
+        margin-bottom: 0
+
+  .strip-stats
+    display: flex
+    flex-direction: column
+    gap: 32px
+    padding-top: 52px
+
+    .stat
+      .stat-number
+        font-family: 'Playfair Display', serif
+        font-size: 3.5rem
+        font-weight: 900
+        color: $accent
+        display: block
+        line-height: 1
+
+      .stat-label
+        font-family: 'DM Mono', monospace
+        font-size: 0.72rem
+        color: $muted
+        letter-spacing: 0.1em
+        text-transform: uppercase
+        margin-top: 6px
+        display: block
+
+// ─── CONTACT TEASER ────────────────────────────────────────
+.contact-teaser
+  padding: 120px 60px
+  text-align: center
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 0
+
+  .section-number
+    margin-bottom: 20px
 
   h2
-    margin-bottom: 40px
-    font-size: 1.8rem
+    font-family: 'Playfair Display', serif
+    font-size: clamp(2.5rem, 6vw, 5rem)
+    font-weight: 900
+    line-height: 1.05
+    margin-bottom: 20px
 
-  .contact-container
+  p
+    font-size: 1.1rem
+    color: rgba($parchment, 0.55)
+    max-width: 500px
+    margin-bottom: 44px
+    line-height: 1.7
+
+  .contact-links
     display: flex
-    gap: 60px
+    gap: 36px
+    margin-top: 32px
+    flex-wrap: wrap
+    justify-content: center
+
+    a
+      font-family: 'DM Mono', monospace
+      font-size: 0.78rem
+      color: $muted
+      text-decoration: none
+      letter-spacing: 0.08em
+      transition: color 0.25s
+      border-bottom: 1px solid transparent
+      padding-bottom: 2px
+
+      &:hover
+        color: $parchment
+        border-bottom-color: rgba($parchment, 0.3)
+
+      &:focus-visible
+        outline: 2px solid $accent
+        outline-offset: 4px
+        border-radius: 2px
+
+// ─── KEYFRAMES ─────────────────────────────────────────────
+@keyframes pulse-dot
+  0%, 100%
+    opacity: 1
+    transform: scale(1)
+  50%
+    opacity: 0.5
+    transform: scale(0.8)
+
+@keyframes line-drop
+  0%
+    transform: scaleY(0)
+    transform-origin: top
+  50%
+    transform: scaleY(1)
+    transform-origin: top
+  51%
+    transform-origin: bottom
+  100%
+    transform: scaleY(0)
+    transform-origin: bottom
+
+// ─── RESPONSIVE ────────────────────────────────────────────
+@media (max-width: 900px)
+  .navbar
+    padding: 22px 24px
+    &.scrolled
+      padding: 16px 24px
+    nav
+      display: none
+    .nav-cta
+      display: none
+
+  .hero
+    padding: 120px 24px 60px
+    .hero-main
+      grid-template-columns: 1fr
+      gap: 40px
+    .hero-number
+      display: none
+    .hero-scroll
+      display: none
+    .hero-title .line-big
+      font-size: clamp(3.5rem, 15vw, 6rem)
+
+  .section-header
+    padding: 0 24px
+    padding-bottom: 20px
     flex-wrap: wrap
 
-    .tech-stack
-      flex: 1
-      min-width: 250px
-      display: flex
-      flex-direction: column
-      gap: 20px
+  .projects-section .projects-list
+    padding: 0 24px
 
-      .tech-circle
-        display: flex
-        align-items: center
-        gap: 15px
-        padding: 10px
-        border-radius: 50px
-        transition: all 0.3s
-        cursor: default
-        color: $text-gray
-        font-weight: 500
-        border: 1px solid transparent
+  .project-row
+    grid-template-columns: 1fr 40px
+    gap: 16px
 
-        &:hover
-          color: $text-white
-          background: rgba(255,255,255,0.05)
-          border-color: rgba($primary-green, 0.3)
-          transform: translateX(10px)
+    .project-index, .project-thumb
+      display: none
 
-        svg
-          min-width: 24px
+  .about-strip
+    padding: 80px 24px
+    .strip-inner
+      grid-template-columns: 1fr
+      gap: 48px
+    .strip-stats
+      flex-direction: row
+      flex-wrap: wrap
+      padding-top: 0
 
-    .contact-form
-      flex: 1.5
-      min-width: 300px
+  .contact-teaser
+    padding: 80px 24px
 
-      .form-group
-        margin-bottom: 20px
+    // Cambios en la tarjeta original
+.project-row.clickable
+  cursor: pointer // Indicamos que toda la fila es clicable
 
-        label
-          display: block
-          font-size: 0.9rem
-          margin-bottom: 8px
-          color: $text-gray
+.project-thumb
+  width: 180px !important // Aumentamos el tamaño de la imagen (antes 120px)
+  height: 108px !important
 
-        input, textarea
-          width: 100%
-          background: $bg-card
-          border: 1px solid $border-color
-          padding: 12px
-          border-radius: 8px
-          color: $text-white
-          font-family: inherit
-          transition: border-color 0.3s
+@media (max-width: 900px)
+  .project-row
+    grid-template-columns: 1fr 40px !important // Reajuste móvil si es necesario
 
-          &:focus
-            outline: none
-            border-color: $primary-green
+// Estilos del nuevo Modal
+.modal-backdrop
+  position: fixed
+  inset: 0
+  background: rgba($ink, 0.85)
+  backdrop-filter: blur(8px)
+  z-index: 999
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 40px
 
-        textarea
-          height: 120px
-          resize: none
+.modal-container
+  background: $card
+  border: 1px solid $border
+  border-radius: 4px
+  width: 100%
+  max-width: 700px
+  max-height: 90vh
+  overflow-y: auto
+  position: relative
+  padding: 48px
+  animation: modal-fade-in 0.3s ease-out
 
-      .form-footer
-        display: flex
-        justify-content: space-between
-        align-items: center
-        margin-top: 30px
+  &::-webkit-scrollbar
+    width: 6px
+  &::-webkit-scrollbar-thumb
+    background: $muted
+    border-radius: 3px
 
-        .btn-full
-          width: auto
-          min-width: 150px
+.modal-close
+  position: absolute
+  top: 24px
+  right: 24px
+  background: transparent
+  border: none
+  color: $muted
+  cursor: pointer
+  transition: color 0.2s
 
-        .social-icons
-          display: flex
-          gap: 15px
+  &:hover
+    color: $accent
 
-          .soc
-            width: 36px
-            height: 36px
-            background: $bg-card
-            border-radius: 50%
-            display: flex
-            align-items: center
-            justify-content: center
-            font-size: 0.8rem
-            color: $text-gray
-            cursor: pointer
-            border: 1px solid $border-color
-            transition: all 0.3s
-            &:hover
-              background: $primary-green
-              color: black
-              border-color: $primary-green
-              transform: translateY(-3px)
+.modal-eyebrow
+  font-family: 'DM Mono', monospace
+  font-size: 0.75rem
+  color: $accent
+  letter-spacing: 0.1em
+  text-transform: uppercase
+  display: block
+  margin-bottom: 12px
+
+.modal-body h2
+  font-family: 'Playfair Display', serif
+  font-size: 2.5rem
+  font-weight: 700
+  margin-bottom: 24px
+  color: $parchment
+
+.modal-hero-img
+  width: 100%
+  height: auto
+  aspect-ratio: 16/9
+  object-fit: cover
+  border-radius: 4px
+  margin-bottom: 32px
+  border: 1px solid $border
+
+.modal-text p
+  color: rgba($parchment, 0.7)
+  font-size: 1.05rem
+  line-height: 1.8
+  margin-bottom: 24px
+
+.modal-text h3
+  font-family: 'Playfair Display', serif
+  font-size: 1.4rem
+  color: $parchment
+  margin: 32px 0 16px
+
+.modal-list
+  list-style: none
+  padding: 0
+
+  li
+    position: relative
+    padding-left: 20px
+    color: rgba($parchment, 0.7)
+    margin-bottom: 12px
+    font-size: 1rem
+
+    &::before
+      content: '→'
+      position: absolute
+      left: 0
+      color: $accent
+      font-family: 'DM Mono', monospace
+
+@keyframes modal-fade-in
+  from
+    opacity: 0
+    transform: translateY(20px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+@media (max-width: 768px)
+  .modal-backdrop
+    padding: 20px
+  .modal-container
+    padding: 32px 24px
 </style>
