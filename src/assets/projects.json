@@ -15,7 +15,7 @@
     "image": "/img/pdfs.png",
     "desc": "Editor de presentaciones a partir de pdfs o powerpoints en tiempo real convirtiendolos en html para hacer paginas web a modo de presentaciones interactivas.",
     "tags": ["Vue", "Nest.js", "MongoDB", "AI"],
-    "url": "https://firebase-firestore-pinia-favoritos.vercel.app",
+    "url": "https://pdfs-interactivos.vercel.app/",
     "github": "#",
     "destacados": true
   }

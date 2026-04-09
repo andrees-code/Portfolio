@@ -1,9 +1,11 @@
 {
   "rol": "Full Stack Developer",
-  "duracion": "3 meses",
-  "descripcion_larga": "TuZona App nació con la necesidad de... Aquí puedes explayarte todo lo que quieras sobre el problema, la solución y la arquitectura.",
+  "duracion": "6 meses",
+  "descripcion_larga": "Para transformar el estudio estático en una experiencia altamente interactiva y personalizada, TuZona App centraliza el aprendizaje en un entorno inteligente. La plataforma permite a los estudiantes afianzar conocimientos mediante un motor de Inteligencia Artificial que genera exámenes a medida y retos gamificados en tiempo real. A nivel técnico, la arquitectura está diseñada de cero para garantizar alto rendimiento y escalabilidad: un frontend ágil desarrollado en Vue.js proporciona una experiencia de usuario fluida, mientras que un backend robusto en Nest.js orquesta la lógica compleja y las peticiones a la IA. La persistencia de datos se gestiona con MongoDB, ofreciendo la flexibilidad necesaria para almacenar el volumen masivo de preguntas dinámicas y el historial de progreso detallado de cada usuario.",
   "retos": [
-    "Integración de la IA para generar respuestas en tiempo real.",
-    "Optimización de consultas en MongoDB."
+    "Integración y afinamiento de la IA para generar exámenes precisos y adaptados a diferentes niveles de dificultad sin latencia perceptible.",
+    "Optimización del modelado de datos y consultas en MongoDB para gestionar eficientemente el historial de estudio y las estadísticas en tiempo real.",
+    "Diseño de un sistema asíncrono en Nest.js para procesar las llamadas a la API de IA sin bloquear el servidor durante picos de uso.",
+    "Manejo avanzado del estado en Vue.js para soportar el dinamismo de los retos y proporcionar un feedback visual inmediato al estudiante."
   ]
 }
