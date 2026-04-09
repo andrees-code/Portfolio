@@ -39,7 +39,8 @@
       <article
         v-for="(project, index) in filteredProjects"
         :key="project.title"
-        class="project-card"
+        class="project-card clickable"
+        @click="openModal(project)"
       >
         <div class="card-visual">
           <img v-if="project.image" :src="project.image" :alt="'Captura de pantalla de ' + project.title" />
@@ -63,17 +64,11 @@
           <p class="card-desc">{{ project.desc }}</p>
 
           <div class="card-footer">
-            <a :href="project.url" target="_blank" rel="noopener noreferrer" class="card-link" :aria-label="'Ver demo de ' + project.title">
-              <span>Ver demo</span>
+            <a :href="project.url" target="_blank" rel="noopener noreferrer" class="card-link" :aria-label="(project.en_desarrollo ? 'Ver demo' : 'Ver proyecto') + ' de ' + project.title" @click.stop>
+              <span>{{ project.en_desarrollo ? 'Ver demo' : 'Ver proyecto' }}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M7 17L17 7M17 7H7M17 7v10"/>
               </svg>
-            </a>
-            <a v-if="project.github" :href="project.github" target="_blank" rel="noopener noreferrer" class="card-link ghost" :aria-label="'Ver repositorio de ' + project.title">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-              </svg>
-              <span>Código</span>
             </a>
           </div>
         </div>
@@ -82,6 +77,38 @@
 
     <div v-if="filteredProjects.length === 0" class="empty-state" role="alert">
       <p>No hay proyectos con el filtro <em>{{ currentFilter }}</em> por ahora.</p>
+    </div>
+
+    <!-- MODAL -->
+    <div v-if="isModalOpen" class="modal-backdrop" @click="closeModal">
+      <div class="modal-container" @click.stop>
+        <button class="modal-close" @click="closeModal" aria-label="Cerrar modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+
+        <div v-if="isLoadingDetails" class="modal-loading">
+          Cargando detalles...
+        </div>
+
+        <div v-else-if="activeProject" class="modal-body">
+          <span class="modal-eyebrow">{{ activeProject.rol }} · {{ activeProject.duracion }}</span>
+          <h2>{{ activeProject.title }}</h2>
+          <img v-if="activeProject.image" :src="activeProject.image" class="modal-hero-img" alt="" />
+
+          <div class="modal-text">
+            <p>{{ activeProject.descripcion_larga }}</p>
+
+            <h3 v-if="activeProject.retos">Retos Técnicos</h3>
+            <ul v-if="activeProject.retos" class="modal-list">
+              <li v-for="(reto, idx) in activeProject.retos" :key="idx">{{ reto }}</li>
+            </ul>
+          </div>
+
+          <a :href="activeProject.url" target="_blank" class="btn-primary" style="margin-top: 24px;">{{ activeProject.en_desarrollo ? 'Ver Demo' : 'Visitar Proyecto' }}</a>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -105,6 +132,45 @@ const filteredProjects = computed(() => {
   if (currentFilter.value === 'Todos') return projects.value
   return projects.value.filter(p => p.tags.includes(currentFilter.value))
 })
+
+// --- ESTADO DEL MODAL ---
+const isModalOpen = ref(false)
+const activeProject = ref(null)
+const isLoadingDetails = ref(false)
+
+const openModal = async (projectBase) => {
+  isModalOpen.value = true
+  isLoadingDetails.value = true
+
+  try {
+    // Usamos fetch nativo apuntando a la carpeta public
+    const response = await fetch(`/projects-details/${projectBase.id}.json`)
+
+    // Si el archivo no existe (ej. error 404), lanzamos un error para ir al catch
+    if (!response.ok) throw new Error('Archivo JSON no encontrado')
+
+    // Convertimos la respuesta a JSON
+    const extraData = await response.json()
+
+    // Fusionamos la info principal con la del JSON individual
+    activeProject.value = { ...projectBase, ...extraData }
+
+  } catch (error) {
+    console.error(`Fallo al cargar detalles de ${projectBase.id}:`, error)
+    // Fallback: Si falla, mostramos la info básica de la tarjeta
+    activeProject.value = { ...projectBase, descripcion_larga: projectBase.desc }
+  } finally {
+    isLoadingDetails.value = false
+    document.body.style.overflow = 'hidden' // Bloquea el scroll del fondo
+  }
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
+  setTimeout(() => { activeProject.value = null }, 300) // Limpiar tras la animación
+  // Restaurar el scroll
+  document.body.style.overflow = 'auto'
+}
 </script>
 
 <style lang="sass" scoped>
@@ -450,4 +516,131 @@ $border:    rgba(242,237,230,0.1)
 
   .card-body
     padding: 24px !important
+
+// ─── MODAL ──────────────────────────────────────────────────
+.modal-backdrop
+  position: fixed
+  inset: 0
+  background: rgba($ink, 0.85)
+  backdrop-filter: blur(8px)
+  z-index: 999
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 40px
+
+.modal-container
+  background: $card
+  border: 1px solid $border
+  border-radius: 4px
+  width: 100%
+  max-width: 700px
+  max-height: 90vh
+  overflow-y: auto
+  position: relative
+  padding: 48px
+  animation: modal-fade-in 0.3s ease-out
+
+  &::-webkit-scrollbar
+    width: 6px
+  &::-webkit-scrollbar-thumb
+    background: $muted
+    border-radius: 3px
+
+.modal-close
+  position: absolute
+  top: 24px
+  right: 24px
+  background: transparent
+  border: none
+  color: $muted
+  cursor: pointer
+  transition: color 0.2s
+
+  &:hover
+    color: $accent
+
+.modal-eyebrow
+  font-family: 'DM Mono', monospace
+  font-size: 0.75rem
+  color: $accent
+  letter-spacing: 0.1em
+  text-transform: uppercase
+  display: block
+  margin-bottom: 12px
+
+.modal-body h2
+  font-family: 'Playfair Display', serif
+  font-size: 2.5rem
+  font-weight: 700
+  margin-bottom: 24px
+  color: $parchment
+
+.modal-hero-img
+  width: 100%
+  height: auto
+  aspect-ratio: 16/9
+  object-fit: cover
+  border-radius: 4px
+  margin-bottom: 32px
+  border: 1px solid $border
+
+.modal-text p
+  color: rgba($parchment, 0.7)
+  font-size: 1.05rem
+  line-height: 1.8
+  margin-bottom: 24px
+
+.modal-text h3
+  font-family: 'Playfair Display', serif
+  font-size: 1.4rem
+  color: $parchment
+  margin: 32px 0 16px
+
+.modal-list
+  list-style: none
+  padding: 0
+
+  li
+    position: relative
+    padding-left: 20px
+    color: rgba($parchment, 0.7)
+    margin-bottom: 12px
+    font-size: 1rem
+
+    &::before
+      content: '→'
+      position: absolute
+      left: 0
+      color: $accent
+      font-family: 'DM Mono', monospace
+
+.modal-loading
+  text-align: center
+  padding: 60px 0
+  color: $muted
+  font-size: 1.1rem
+
+@keyframes modal-fade-in
+  from
+    opacity: 0
+    transform: translateY(20px)
+  to
+    opacity: 1
+    transform: translateY(0)
+
+@media (max-width: 768px)
+  .modal-backdrop
+    padding: 20px
+  .modal-container
+    padding: 32px 24px
+
+// ─── CLICKABLE CARDS ───────────────────────────────────────
+.project-card.clickable
+  cursor: pointer
+  transition: transform 0.2s ease, box-shadow 0.2s ease
+
+  &:hover
+    transform: translateY(-4px)
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3)
 </style>
