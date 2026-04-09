@@ -147,7 +147,7 @@
             <span class="stat-label">Tecnologías</span>
           </div>
           <div class="stat" role="listitem">
-            <span class="stat-number" aria-label="100 porciento remoto">100%</span>
+            <span class="stat-number" aria-label="100 porciento remoto">50%</span>
             <span class="stat-label">Remoto</span>
           </div>
         </div>
